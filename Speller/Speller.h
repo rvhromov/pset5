@@ -3,7 +3,7 @@
 #include <ctime>
 #include "Dictionary.h"
 
-class SpellCheck
+class Speller
 {
 private:
     Dictionary *dicts;
@@ -13,7 +13,7 @@ private:
     double startTime, endTime;
 
 public:
-    SpellCheck()
+    Speller()
     {
         dicts = new Dictionary();
         misspellings = 0;
@@ -30,7 +30,7 @@ public:
         executionTime();
     }
 
-    ~SpellCheck()
+    ~Speller()
     {
         delete dicts;
     }
