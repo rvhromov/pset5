@@ -13,78 +13,63 @@ class LinkedList
 {
 private:
     Node *head;
-    int size;
-    int counter;
+    int sizeOfList;
 
 public:
     LinkedList()
     {
        head = NULL;
-       size = 0;
-       counter = 0;
+       sizeOfList = 0;
     }
 
-    void addElement(int element)
+    void add(int element)
     {
         Node *newNode = new Node();
         Node *tmp = new Node();
-        // Установить значение для узла
+        // Set a value for node 
         newNode -> data = element;
-        // Следующий узел указывает в конец списка
+        // Next node points to the end of the list
         newNode -> next = NULL;
 
-        // Если список не пустой
+        // If list isn't empty
         if (head != NULL)
         {
             tmp = head;
-            // Дойти до конца списка
+            // Reach the end of the list
             while (tmp -> next != NULL)
                 tmp = tmp -> next;
 
-            // Вставить новый элемент в конец списка
+            // Insert new element into the end of the list
             tmp -> next = newNode;
         }
-        // Иначе, новый узел будет первым элемнтом в списке
+        // Otherwise, new node is the first element in the list
         else
+        {
             head = newNode;
+        }
 
-        size++;
+        sizeOfList++;
     }
 
-    void removeElement(int index)
+    void remove(int index)
     {
         Node *current = head;
         Node *previous = new Node();
-        Node *tail = new Node();
 
-        // Если список пуст
+        // If list is empty
         if (current == NULL)
         {
             cout << "The list is empty! Nothing to delete" << endl;
             return;
         }
-        // Если нужно удалить первый элемент списка
+        // If need to remove the first element of the list
         if (index == 0)
         {
             head = head -> next;
             delete current;
-            size--;
+            sizeOfList--;
         }
-        // Если нужно удалить последний элемент в списке
-        else if (current -> next == NULL)
-        {
-            while (current -> next != NULL)
-            {
-                previous = current;
-                current = current -> next;
-            }
-
-            tail = previous;
-            previous -> next = NULL;
-            delete current;
-            size--;
-        }
-        // Иначе - нужно удалить элементы в середине
+        // Otherwise - remove other elements
         else
         {
             for (int i = 1; i < index; i++)
@@ -95,11 +80,11 @@ public:
 
             previous -> next = current -> next;
             delete current;
-            size--;
+            sizeOfList--;
         }
     }
 
-    void insertElement(int element, int index)
+    void set(int element, int index)
     {
         Node *newNode = new Node();
         Node *current = head;
@@ -107,14 +92,14 @@ public:
 
         newNode -> data = element;
 
-        // Если элемнт нужно вставить в начало списка
+        // If element needs to be inserted at the beginning of the list
         if (index == 0)
         {
             newNode -> next = head;
             head = newNode;
-            size++;
+            sizeOfList++;
         }
-        // Если элемнт нужно вставить где-то в середину
+        // Otherwise element needs to be inserted somewhere else
         else
         {
            for (int i = 1; i < index; i++)
@@ -125,17 +110,18 @@ public:
 
             previous -> next = newNode;
             newNode -> next = current;
-            size++;
+            sizeOfList++;
         }
 
     }
 
-    void searchForElement(int element)
+    void search(int element)
     {
         Node *node = head;
+        int counter = 0;
         bool wasFound = false;
 
-        // Пока не конец списка - сравнивать элементы с искомым
+        // Until not the end of the list - compare elements
         while (node)
         {
             if (node -> data == element)
@@ -153,15 +139,15 @@ public:
             cout << "Element " << element << " is not in the list!" << endl;
     }
 
-    int getSize()
+    int size()
     {
-        return size;
+        return sizeOfList;
     }
 
     void show()
     {
         Node *node = head;
-        // Пока не конец списка - вывести каждый эелемент
+        // Until not the end of the list - display every element
         while (node)
         {
             cout << node -> data << " ";
@@ -174,20 +160,20 @@ int main()
 {
     LinkedList *linked = new LinkedList();
 
-    // Добавить 10 элементов в список
+    // Add 10 elements to the list
     for (int i = 0; i < 10; i++)
-        linked -> addElement(i);
+        linked -> add(i);
 
-    // Удалить девятый элемент
-    linked -> removeElement(9);
-    // Вставить элемент "7" на 5 место в списке
-    linked -> insertElement(7, 5);
-    // Вывести список на экран
+    // Remove ninth element
+    linked -> remove(9);
+    // Insert element "7" on the fifth place in the list
+    linked -> set(7, 5);
+    // Display the whole list
     linked -> show();
-    // Размер списка
-    cout << "\nSize: " << linked -> getSize() << endl;
-    // Проверить есть ли элемент "4" в списке
-    linked -> searchForElement(4);
+    // Size of the list
+    cout << "\nSize: " << linked -> size() << endl;
+    // Search for element "4" in the list
+    linked -> search(4);
 
     delete linked;
     return 0;
