@@ -4,7 +4,7 @@ using namespace std;
 
 int main()
 {
-    SpellCheck *sc = new SpellCheck();
-    delete sc;
+    Speller *s = new Speller();
+    delete s;
     return 0;
 }
