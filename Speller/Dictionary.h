@@ -1,55 +1,61 @@
 #ifndef DICTIONARY_H_INCLUDED
 #define DICTIONARY_H_INCLUDED
-
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
-#include "Node.h"
 
-#define LENGTH 45
-#define SIZE 27
-#define MULTIPLIER 31
+#define MAX_WORD_LENGTH 46
+#define HASHTABLE_SIZE 27
+#define POLYNOM 31
 
 using namespace::std;
+
+class Node
+{
+public:
+    char *word;
+    Node *next;
+};
+
+Node *hashtable[HASHTABLE_SIZE];
 
 class Dictionary
 {
 private:
-    // Количество слов в словаре
-    int words;
-    // Слово
-    char word[LENGTH + 1];
+    // Amount of words in dictionary
+    int amountOfWords;
+    // A word
+    char word[MAX_WORD_LENGTH];
 
-    // Функция хеширования. Возвращает хеш строки
-    // Взято - stackoverflow.com/questions/20462826/hash-function-for-strings-in-c
+    // Hash function. Returns hash of the string
+    // Taken - stackoverflow.com/questions/20462826/hash-function-for-strings-in-c
     unsigned int hash(char *word)
     {
         unsigned int hash = 0;
 
         for (int i = 0; word[i] != '\0'; i++)
-            hash = MULTIPLIER * hash + tolower(word[i]);
+            hash = POLYNOM * hash + tolower(word[i]);
 
-        return hash % SIZE;
+        return hash % HASHTABLE_SIZE;
     }
 
 public:
     Dictionary()
     {
-        words = 0;
+        amountOfWords = 0;
     }
 
-    // Функция проверки. Возвращает true, если слово есть в словаре, иначе - false
+    // Returns true if word is in dictionary, else false.
     bool check(char *word)
     {
-        // Указатель на первый узел
+        // Pointer to the first node
         Node *cursor = new Node();
-        // Найти местоположение слова
         cursor = hashtable[hash(word)];
 
         while (cursor != NULL)
         {
-            // Ищет слово в hashtable, сравнение строк без учёта регистра
+            // Looks for word in hashtable, comparing strings
             if (strcasecmp(cursor -> word, word) == 0)
                 return true;
 
@@ -59,10 +65,10 @@ public:
         return false;
     }
 
-    // Функция загрузки. Загружает словарь в память, возвращает true, если успешно, иначе - false
+    // Loads dictionary into memory. Returns true if successful, else false
     bool load(char  *dictionary)
     {
-        // Открыть файл для чтения
+        // Open file for reading
         FILE *f = fopen(dictionary, "r");
         if(f == NULL)
         {
@@ -70,10 +76,10 @@ public:
             return false;
         }
 
-        // Читать каждую строку пока не конец файла
+        // Read every string while not the end of a file
         while(fscanf(f, "%s", word) != EOF)
         {
-            words++;
+            amountOfWords++;
 
             Node *newNode = new Node();
             if(newNode == NULL)
@@ -81,15 +87,15 @@ public:
                 unload();
                 return false;
             }
-            // Выделить память
+            // Allocate memory
             newNode -> word = (char *)malloc(strlen(word) + 1);
-            // Установить значение для узла
+            // Set value for node 
             strcpy(newNode -> word, word);
-            // Хешировать значение узла
+            // Hash node's value
             int index = hash(newNode -> word);
-            // Добавить новый узел
+            // Add new node
             newNode -> next = hashtable[index];
-            // Указывать на новый узел
+            // Point to new node
             hashtable[index] = newNode;
         }
 
@@ -97,22 +103,21 @@ public:
         return true;
     }
 
-    // Функция получения размера. Возвращает количество слов в загруженном словаре,
-    // если словарь еще не загружен возвращает 0
+    // Returns number of words in dictionary if loaded, else 0 if not yet loaded
     int size()
     {
-        return words;
+        return amountOfWords;
     }
 
-    // Функция выгрузки из памяти. Выгружает словарь из памяти
+    // Unload dictionary from memory. Returns true if successful, else false
     void unload()
     {
-        // Освободить каждый элемент в hashtable
-        for (int i = 0; i < SIZE; i++)
+        // Free every element in hashtable
+        for (int i = 0; i < HASHTABLE_SIZE; i++)
         {
-            // Текущий узел
+            // Current node
             Node *cursor = hashtable[i];
-            // Освободить узел
+            // Free node
             while (cursor != NULL)
             {
                 Node *tmp = cursor;
