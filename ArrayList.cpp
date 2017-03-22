@@ -3,105 +3,108 @@
 
 using namespace std;
 
-#define MULTIPLIER 2
+#define ARRAY_SIZE_MULTIPLIER 2
 
 class ArrayList
 {
 private:
-    int size;
-    int index;
-    int counter;
-    bool wasFound;
+    int sizeOfArray;
+    int amountOfElements;
     int *arrayList;
 
     void makeBiggerArray()
     {
-        // Временный массив для хранения
-        int *tmp = new int[size];
-        // Копировать все элементы основного массива во временный
-        for (int i = 0; i < size; i++)
-            tmp[i] = arrayList[i];
-        // Увеличить размер в 2 раза
-        size *= MULTIPLIER;
-        // Увеличить размер основного массива в 2 раза
-        arrayList = new int[size];
-        // Копировать все элементы обратно в основной массив
-        for (int i = 0; i < size; i++)
-            arrayList[i] = tmp[i];
-        // Освободить память
-        delete tmp;
+        // Temporary storage array
+        int *tmpArray = new int[sizeOfArray];
+        // Copy all elements from main array to the temporary
+        for (int i = 0; i < sizeOfArray; i++)
+            tmpArray[i] = arrayList[i];
+        // Increase size by 2 times
+        sizeOfArray *= ARRAY_SIZE_MULTIPLIER;
+        // Increase size of the main array by 2 times
+        arrayList = new int[sizeOfArray];
+        // Copy all elements back to the main array
+        for (int i = 0; i < sizeOfArray; i++)
+            arrayList[i] = tmpArray[i];
+        // Free up the memory
+        delete tmpArray;
     }
 
 public:
     ArrayList()
     {
-        size = 10;
-        index = 0;
-        counter = 0;
-        wasFound = false;
-        arrayList = new int[size];
+        sizeOfArray = 10;
+        amountOfElements = 0;
+        arrayList = new int[sizeOfArray];
     }
 
-    void addElement(int element)
+    ~ArrayList()
     {
-        // Если элементов больше чем массив может принять
-        if (index >= size)
+        delete arrayList;
+    }
+
+    void add(int element)
+    {
+        // If amount of elements bigger than size of array
+        if (amountOfElements >= sizeOfArray)
             makeBiggerArray();
-        // Добавить элемент в массив
-        arrayList[index] = element;
-        index++;
+        // Add element to the array
+        arrayList[amountOfElements] = element;
+        amountOfElements++;
     }
 
-    void removeElement(int indexOfElement)
+    void remove(int indexOfElement)
     {
-        // Сдвинуть все эелементы, начиная с того который нужно удалить, на 1 влево
-        for (int i = indexOfElement; i < index; i++)
+        // Move all elements, starting with one which needs to be deleted on 1 position left
+        for (int i = indexOfElement; i < amountOfElements; i++)
             arrayList[i] = arrayList[i + 1];
 
-        size--;
-        index--;
+        sizeOfArray--;
+        amountOfElements--;
     }
 
-    void insertElement(int element, int indexOfElement)
+    void set(int element, int indexOfElement)
     {
-        // Если элементов больше чем массив может принять
-        if (index >= size)
+        // If amount of elements bigger than size of array
+        if (amountOfElements >= sizeOfArray)
             makeBiggerArray();
 
-        // Сдвинуть все элементы на 1 вправо до индекса на который нужно вставить элемент
-        for (int i = index; i > indexOfElement; i--)
+        // Move all elements on the 1 right to the index on which you want to insert the element
+        for (int i = amountOfElements; i > indexOfElement; i--)
             arrayList[i] = arrayList[i - 1];
 
         arrayList[indexOfElement] = element;
 
-        size++;
-        index++;
+        sizeOfArray++;
+        amountOfElements++;
     }
 
-    void *trimToSize(int trim)
+    void trimToSize(int trim)
     {
-        // Временный массив для хранения
-        int *tmp = new int[trim];
-        index = trim;
-        size = trim;
+        // Temporary storage array
+        int *tmpArray = new int[trim];
+        amountOfElements = trim;
+        sizeOfArray = trim;
 
-        // Копировать все элементы основного массива во временный
+        // Copy all elements from main array to the temporary
         for (int i = 0; i <= trim; i++)
-            tmp[i] = arrayList[i];
+            tmpArray[i] = arrayList[i];
 
-        // Новый размер основного массива
+        // New size of the main array 
         int *arrayList = new int[trim];
-        // Копировать все элементы обратно в основной массив
+        // Copy all elements back to the main array
         for (int i = 0; i <= trim; i++)
-            arrayList[i] = tmp[i];
-        // Освободить память
-        delete tmp;
+            arrayList[i] = tmpArray[i];
+        // Free up the memory
+        delete tmpArray;
     }
 
-    void searchForElement(int element)
+    void search(int element)
     {
-        // Пройти по всему списку и сравнить каждый элемент с искомым
-        for (int i = 0; i < index; i++)
+        bool wasFound = false;
+        int counter = 0;
+        // Pass through the whole list and compare elements
+        for (int i = 0; i < amountOfElements; i++)
         {
             if (arrayList[i] == element)
             {
@@ -117,14 +120,14 @@ public:
 
     }
 
-    int getSize()
+    int size()
     {
-        return index;
+        return amountOfElements;
     }
 
     void show()
     {
-        for (int i = 0; i < index; i++)
+        for (int i = 0; i < amountOfElements; i++)
             cout << arrayList[i] << " ";
     }
 };
@@ -133,22 +136,22 @@ int main()
 {
     ArrayList *newList = new ArrayList();
 
-    // Добавить эелементы в список
+    // Add elements to the list
     for (int i = 0; i < 14; i++)
-        newList -> addElement(i);
+        newList -> add(i);
 
-    // Удалить 8 элемент
-    newList -> removeElement(7);
-    // вставить элемент "89" на 3 место в списке
-    newList -> insertElement(89, 2);
-    // Обрезать список до 11 элементов
+    // Remove eighth element
+    newList -> remove(7);
+    // Insert element "89" on the third place in the list
+    newList -> set(89, 2);
+    // Trim list to 11 elements
     newList -> trimToSize(11);
-    // Вывести список на экран
+    // Display list
     newList -> show();
-    // Размер списка
-    cout << "\nSize: " << newList -> getSize() << endl;
-    // Проверить, есть ли элемент "10" в списке
-    newList -> searchForElement(10);
+    // Size of the list
+    cout << "\nSize: " << newList -> size() << endl;
+    // Search for element "10" in the list
+    newList -> search(10);
 
     delete newList;
     return 0;
