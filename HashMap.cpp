@@ -1,169 +1,99 @@
 #include <iostream>
+#include <cstring>
 
 using namespace std;
 
-#define SIZE 128
-
-class Node
-{
-public:
-    int key;
-	int value;
-	Node *next;
-
-    Node(int key, int value)
-    {
-        this -> key = key;
-	    this -> value = value;
-	    this -> next = NULL;
-    }
-};
+#define ARRAY_SIZE 10000
+#define POLYNOM 31
 
 class HashMap
 {
 private:
-    Node **hashTable;
-    Node **tmpTable;
-    int sizeOfMap;
+    string hashTable[ARRAY_SIZE];
+    int sizeOfHashTable;
+    // Hash function
+    unsigned int getHash(string word)
+    {
+        unsigned int hash = 0;
+
+        for (int i = 0; word[i] != '\0'; i++)
+            hash = POLYNOM * hash + word[i];
+
+        return hash % ARRAY_SIZE;
+    }
 
 public:
     HashMap()
     {
-        sizeOfMap = 0;
-        hashTable = new Node *[SIZE];
-
-        // Инициализация хешмапа NULL значениями
-        for (int i = 0; i < SIZE; i++)
-            hashTable[i] = NULL;
-    }
-    // Простая хеш-функция
-    int hashFunc(int key)
-    {
-        return key % SIZE;
+        sizeOfHashTable = 0;
     }
 
-    // Добавление элемента в хешмап
-    void setElement(int key, int value)
+    void add(string str)
     {
-        // Получить хеш
-        int hash = hashFunc(key);
-        Node *prev = NULL;
-        Node *node = hashTable[hash];
+        // Add element
+        hashTable[getHash(str)] = str;
+        sizeOfHashTable++;
+    }
 
-        // Добавить новый ключ в хешмап
-        while (node != NULL)
+    void remove(string str)
+    {
+        // If element which needs to be deleted is found
+        if (hashTable[getHash(str)] == str)
         {
-            prev = node;
-            node = node -> next;
+            // Move all elements, starting with one which needs to be deleted, on 1 position to the left
+            for (int i = getHash(str); i < ARRAY_SIZE - 1; i++)
+                hashTable[i] = hashTable[i + 1];
+
+            cout << "\nElement " << str << " was removed!" << endl;
+            sizeOfHashTable--;
         }
-        // Если таблица пустая
-        if (node == NULL)
-        {
-            // Новый узел
-            node = new Node(key, value);
-            // В начало
-            if (prev == NULL)
-                hashTable[hash] = node;
-            // Следующий элемент
-	        else
-                prev -> next = node;
-        }
-        // Добавить значение
         else
         {
-            node -> value = value;
+            cout << "\nNo such element in table. Nothing to delete!" << endl;
         }
 
-        sizeOfMap++;
     }
 
-    //Удаление элемента с хешмапа
-    void removeElement(int key)
+    void search(string str)
     {
-        // Получить хеш
-        int hash = hashFunc(key);
-        // Пока не конец хешмапа и пока не встретили искомый элемент - продолжаем искать
-        while (hashTable[hash] != NULL && hashTable[hash] -> key != key)
-            hash = hashFunc(hash + 1);
-        // Если ничего не найдено
-        if (hashTable[hash] == NULL)
-            cout << "Nothing to delete!" << endl;
-        // Иначе - удалить элемент
+        if (hashTable[getHash(str)] == str)
+            cout << "\nElement " << str << " was found!" << endl;
         else
-        {
-            delete hashTable[hash];
-            sizeOfMap--;
-        }
+            cout << "\nElement " << str << " wasn't found!" << endl;
     }
 
-    // Поиск элемента
-    void searchForElement(int key)
+    int size()
     {
-        bool wasFound = false;
-        int hash = hashFunc(key);
-        Node *node = hashTable[hash];
-
-        // Пока не конец хешмапа
-        while (node != NULL)
-	    {
-	        // Если элемент найден
-            if (node -> key == key)
-	        {
-	            wasFound = true;
-                cout << "Element " << node -> value << " was found!" << endl;
-            }
-
-            node = node -> next;
-        }
-        // Если элемент не найден
-        if (!wasFound)
-            cout << "Element wasn't found!" << endl;
+        return sizeOfHashTable;
     }
 
-    // Размер хешмапа
-    int getSize()
-    {
-        return sizeOfMap;
-    }
-
-    // Вывод на экран хешмапа
     void show()
     {
-        int hash;
-
-        for (int i = 0; i < SIZE; i++)
-        {
-            hash = hashFunc(i);
-            Node *node = hashTable[hash];
-
-            while (node)
-            {
-                cout << node -> value << " ";
-                node = node -> next;
-            }
-        }
+        for (int i = 0; i < ARRAY_SIZE; i++)
+            cout << hashTable[i] << " ";
     }
 };
 
 int main()
 {
-    HashMap *newMap = new HashMap();
+    HashMap *hm = new HashMap();
 
-    // Добавить 10 пар "ключ-значение" в хешмап
-    for (int i = 0, j = 0; i < 10; i++, j += 10)
-        newMap -> setElement(i, j);
+    // Add elements
+    hm -> add("mama");
+    hm -> add("amam");
+    hm -> add("papa");
+    hm -> add("son");
+    hm -> add("daughter");
+    hm -> add("family");
+    // Remove element "son"
+    hm -> remove("son");
+    // Search for element "mama"
+    hm -> search("mama");
+    // Size
+    cout << "\nSize: " << hm -> size() << endl;
+    // Display
+    hm -> show();
 
-    // Добавить еще один элемент с ключем "5" в хешмап
-    newMap -> setElement(5, 87);
-    // Удалить 8 элемент
-    newMap -> removeElement(7);
-    // Вывести хешмап на экран
-    newMap -> show();
-    // Размер хешмапа
-    cout << "\nSize: " << newMap -> getSize() << endl;
-    // Поиск по ключу
-    newMap -> searchForElement(5);
-
-    delete newMap;
+    delete hm;
     return 0;
 }
